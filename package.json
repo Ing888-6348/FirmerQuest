@@ -1,0 +1,12 @@
+{
+    "name": "firmerquest",
+    "private": true,
+    "scripts": {
+        "install:all": "cd client && npm install && cd ../server && npm install",
+        "build": "cd client && npm install && npm run build",
+        "start": "cd server && npm install --omit=dev && node src/index.js"
+    },
+    "engines": {
+        "node": "22"
+    }
+}
