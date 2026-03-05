@@ -8,8 +8,8 @@ const port = process.env.PORT || 4000;
 
 connectDb(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(port, "0.0.0.0", () => {
-      console.log(`API running on port ${port}`);
+    app.listen(port, () => {
+      console.log(`API running on http://localhost:${port}`);
     });
   })
   .catch((err) => {
