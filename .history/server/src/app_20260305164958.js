@@ -12,10 +12,6 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-app.get('/', (req, res) => {
-  res.send('FirmerQuest API is running 🚀');
-});
-
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/api/auth', authRoutes);
