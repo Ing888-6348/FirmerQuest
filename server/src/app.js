@@ -24,7 +24,7 @@ const clientDist = path.join(__dirname, '../../client/dist');
 app.use(express.static(clientDist));
 
 // SPA fallback: ส่ง index.html สำหรับทุก route ที่ไม่ใช่ API
-app.get('*', (req, res) => {
+app.get('{*path}', (req, res) => {
   res.sendFile(path.join(clientDist, 'index.html'));
 });
 
