@@ -260,7 +260,7 @@ const exportLogsPDF = async (req, res, next) => {
     const doc = new PDFDocument();
 
     // Register Thai Font
-    const fontPath = path.resolve(__dirname, '../assets/fonts/Sarabun-Regular.ttf');
+    const fontPath = path.resolve(__dirname, '../assets/fonts/THSarabunNew.ttf');
     try {
       doc.registerFont('ThaiFont', fontPath);
       doc.font('ThaiFont');
@@ -270,11 +270,16 @@ const exportLogsPDF = async (req, res, next) => {
 
     doc.pipe(res);
 
-    doc.fontSize(14).text('Logs Report', { align: 'left' });
+    doc.fontSize(18).text('Logs Report', { align: 'center' });
     doc.moveDown(1);
 
     const headers = ['User', 'Endpoint', 'Method', 'Timestamp', 'Labnumber', 'Action', 'Status', 'Message', 'TimeMs'];
-    doc.fontSize(9).text(headers.join(' | '));
+
+    // Draw Header
+    doc.fontSize(10).font('ThaiFont');
+    doc.text(headers.join(' | '), { bold: true });
+    doc.moveDown(0.5);
+    doc.text('-------------------------------------------------------------------------------------------------------------------------');
     doc.moveDown(0.5);
 
     logs.forEach((l) => {
@@ -282,14 +287,15 @@ const exportLogsPDF = async (req, res, next) => {
         l.userName || '',
         l.request?.endpoint || '',
         l.request?.method || '',
-        l.timestamp,
+        l.timestamp ? new Date(l.timestamp).toLocaleString('th-TH') : '',
         (l.labnumber || []).join(', '),
-        l.action,
-        l.response?.statusCode,
-        l.response?.message,
-        l.response?.timeMs
+        l.action || '',
+        l.response?.statusCode || '',
+        l.response?.message || '',
+        l.response?.timeMs || '0'
       ];
-      doc.text(row.join(' | '));
+      doc.fontSize(9).text(row.join(' | '));
+      doc.moveDown(0.2);
     });
 
     doc.end();
