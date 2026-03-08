@@ -55,7 +55,7 @@ const USERS = [
         firstname: 'สมศักดิ์',
         lastname: 'ผู้ดูแล',
         level: 'admin',
-        logCount: 80
+        logCount: 200
     },
     {
         username: 'admin2',
@@ -65,7 +65,7 @@ const USERS = [
         firstname: 'สมหญิง',
         lastname: 'จัดการ',
         level: 'admin',
-        logCount: 60
+        logCount: 150
     },
     {
         username: 'user1',
@@ -75,7 +75,7 @@ const USERS = [
         firstname: 'สมชาย',
         lastname: 'ใจดี',
         level: 'user',
-        logCount: 50
+        logCount: 120
     },
     {
         username: 'user2',
@@ -85,7 +85,7 @@ const USERS = [
         firstname: 'สมหญิง',
         lastname: 'รักดี',
         level: 'user',
-        logCount: 40
+        logCount: 100
     },
     {
         username: 'user3',
@@ -95,7 +95,7 @@ const USERS = [
         firstname: 'สมบูรณ์',
         lastname: 'มั่นคง',
         level: 'user',
-        logCount: 30
+        logCount: 80
     }
 ];
 

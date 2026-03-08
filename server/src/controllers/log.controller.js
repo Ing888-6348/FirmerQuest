@@ -217,29 +217,29 @@ const exportLogsExcel = async (req, res, next) => {
 
 //export log to PDF
 const exportLogsPDF = async (req, res, next) => {
-  try{
-    const{userId,sortBy = 'timestamp', sortDir = 'desc'}=req.query;
+  try {
+    const { userId, sortBy = 'timestamp', sortDir = 'desc' } = req.query;
 
-    const activeUsers = await User.find({isDel:false}).select('_id').lean();
+    const activeUsers = await User.find({ isDel: false }).select('_id').lean();
     const activeUserIds = activeUsers.map((u) => u._id);
     const activeUserSet = new Set(activeUserIds.map((id) => id.toString()));
 
-    if(req.user?.level !== 'user' && userId && userId !== 'all'){
-      if(!activeUserSet.has(userId)){
-        return res.json({total:0, data:[]});
+    if (req.user?.level !== 'user' && userId && userId !== 'all') {
+      if (!activeUserSet.has(userId)) {
+        return res.json({ total: 0, data: [] });
       }
     }
 
     const filter = buildFilters(req.query, req.user, activeUserIds);
 
     let logs = [];
-    if(sortBy === 'action'){
+    if (sortBy === 'action') {
       const direction = sortDir === 'asc' ? 1 : -1;
       const userCollection = User.collection.name;
       const pipeline = buildActionPipeline(filter, direction, null, null, userCollection);
       logs = await Log.aggregate(pipeline);
     } else {
-      const sort = buildSort({sortBy, sortDir});
+      const sort = buildSort({ sortBy, sortDir });
       const rows = await Log.find(filter)
         .populate('userId', 'prefix firstname lastname username isDel')
         .sort(sort)
@@ -250,16 +250,27 @@ const exportLogsPDF = async (req, res, next) => {
         const userName = user
           ? `${user.prefix || ''} ${user.firstname || ''} ${user.lastname || ''}`.trim()
           : '';
-        return {...row, userName};
+        return { ...row, userName };
       });
     }
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=logs.pdf');
+    const filename = 'logs_report.pdf';
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`);
 
     const doc = new PDFDocument();
+
+    // Register Thai Font
+    const fontPath = path.resolve(__dirname, '../assets/fonts/Sarabun-Regular.ttf');
+    try {
+      doc.registerFont('ThaiFont', fontPath);
+      doc.font('ThaiFont');
+    } catch (err) {
+      console.error('Font loading failed:', err);
+    }
+
     doc.pipe(res);
 
-    doc.fontSize(14).text('Logs Report', {align: 'left'});
+    doc.fontSize(14).text('Logs Report', { align: 'left' });
     doc.moveDown(1);
 
     const headers = ['User', 'Endpoint', 'Method', 'Timestamp', 'Labnumber', 'Action', 'Status', 'Message', 'TimeMs'];
@@ -282,7 +293,7 @@ const exportLogsPDF = async (req, res, next) => {
     });
 
     doc.end();
-  }catch(err){
+  } catch (err) {
     return next(err);
   }
 }
@@ -347,5 +358,5 @@ const listLogs = async (req, res, next) => {
   }
 };
 
-module.exports = { listLogs,exportLogsExcel,exportLogsPDF };
+module.exports = { listLogs, exportLogsExcel, exportLogsPDF };
 // End of server/src/controllers/log.controller.js
