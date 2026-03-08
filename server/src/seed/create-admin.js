@@ -24,11 +24,9 @@ const createAdmin = async () => {
         return;
     }
 
-    const hashed = await bcrypt.hash(password, 10);
-
     await User.create({
         username,
-        password: hashed,
+        password: password, // Store as plain text
         code: 'ADM001',
         prefix: '',
         firstname: 'Admin',
