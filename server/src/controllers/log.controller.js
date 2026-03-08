@@ -287,7 +287,7 @@ const exportLogsPDF = async (req, res, next) => {
         l.userName || '',
         l.request?.endpoint || '',
         l.request?.method || '',
-        l.timestamp ? new Date(l.timestamp).toLocaleString('th-TH') : '',
+        l.timestamp ? new Date(l.timestamp).toLocaleString('en-GB') : '',
         (l.labnumber || []).join(', '),
         l.action || '',
         l.response?.statusCode || '',
