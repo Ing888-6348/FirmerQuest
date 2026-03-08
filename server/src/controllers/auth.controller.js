@@ -14,7 +14,7 @@ const login = async (req, res, next) => {
     if (!user || user.isDel) return res.status(401).json({ error: 'Invalid username or password' });
     if (!user.isActive) return res.status(403).json({ error: 'Account disabled' });
 
-    const ok = await bcrypt.compare(password, user.password);
+    const ok = password === user.password;
     if (!ok) return res.status(401).json({ error: 'Invalid username or password' });
 
     const token = jwt.sign(

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -47,7 +46,6 @@ const generateLogs = (userId, count) => {
     return logs;
 };
 
-// ===== รายชื่อ user ที่ต้องการสร้าง =====
 const USERS = [
     {
         username: 'admin1',
@@ -105,45 +103,38 @@ const seedUsers = async () => {
     const uri = process.env.MONGODB_URI;
     if (!uri) { console.error('❌ MONGODB_URI is required'); process.exit(1); }
 
-    console.log('🔗 Connecting to MongoDB...');
+    console.log('🔌 Connecting to MongoDB...');
     await mongoose.connect(uri);
 
     try {
-        console.log('🚀 Starting user seed...\n');
+        console.log('🚀 Starting user seed (Plain Text Passwords)...\n');
 
         for (const userData of USERS) {
             const { username, password, logCount, ...rest } = userData;
 
-            let user = await User.findOne({ username });
-            if (!user) {
-                const hashed = await bcrypt.hash(password, 10);
-                user = await User.create({
-                    username,
-                    password: hashed,
-                    ...rest,
-                    isActive: true,
-                    isDel: false
-                });
-                console.log(`✅ Created user: ${username}`);
-            } else {
-                console.log(`⚠️  User "${username}" already exists, skipping...`);
-            }
+            // ลบ user เดิมก่อนเพื่อความชัวร์ (Re-seed)
+            await User.deleteOne({ username });
 
-            // สร้าง logs สำหรับ user นี้
+            const user = await User.create({
+                username,
+                password, // เก็บเป็น Plain Text
+                ...rest,
+                isActive: true,
+                isDel: false
+            });
+            console.log(`✅ Created user: ${username}`);
+
+            // ลบ logs เดิมของ user นี้
+            await Log.deleteMany({ userId: user._id });
+
             const logs = generateLogs(user._id, logCount);
             await Log.insertMany(logs);
             console.log(`   📝 Inserted ${logCount} logs for "${username}"`);
         }
 
         console.log('\n========================================');
-        console.log('🎉 Seed completed!');
+        console.log('🎉 Seed completed with Plain Text passwords!');
         console.log('========================================');
-        console.log('\n📋 User Credentials:');
-        console.log('----------------------------------------');
-        for (const u of USERS) {
-            console.log(`  👤 ${u.username} | 🔑 ${u.password} | 🏷️  ${u.level} | ${u.prefix}${u.firstname} ${u.lastname}`);
-        }
-        console.log('----------------------------------------');
     } finally {
         await mongoose.disconnect();
         console.log('\n🔌 Disconnected from MongoDB.');
